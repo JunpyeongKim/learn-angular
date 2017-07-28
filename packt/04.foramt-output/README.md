@@ -1,0 +1,49 @@
+4. 데이터 포맷과 출력
+=================
+
+# 4.7 필터로 모델 변형 다루기
+- (*) 뷰에서 파이프(|)를 사용해 호출, 인자는 콜론(:)으로 구분
+    - ex) {{formatDate}}
+- 기본 제공 필터
+    - 서식 변경 필터
+        - currency
+        - date
+        - number
+        - lowercase, uppercase
+        - json : 디버깅 목적으로 많이 사용
+            - <pre>{{someObject | json}}</pre>
+    - 배열 변경 필터
+        - limitTo
+        - filter
+        - orderBy
+    - 'filter' 필터 적용
+        - <tr ng-repeat="backlogItem in backlog | filter:criteria">
+        - <tr ng-repeat="backlogItem in backlog | filter:{name: criteria, done: false}">
+        - <tr ng-repeat="backlogItem in backlog | filter:{$: criteria, done: false}">
+            - $ : 모든 프로퍼티의 이름을 뜻하는 문자 
+        - <tr ng-repeat="backlogItem in backlog | filter:doneAndBigEffort">
+            - doneAndBigEffort(backlogItem)
+                - return backlogItem.don && backlogItem.estimation > 20;
+            - 함수를 필터의 인자로 사용 가능 --> true 인 항목만 결과 배열로 취합한다.
+        - <tr ng-repeat="item in filteredBacklog = (backlog | filter:{$: criteria, done: false}})">
+            - --> Total : {{filteredBacklog.length}}
+    - orderBy 필터로 정렬
+        - (*) filter 필터 뒤에 적용 --> filter보다 high cost라는 성능 때문에
+        - <i ng-class="{'icon-chevron-up': isSortUp('name'), 'icon-chevron-down': isSortDown('name')}"></i>
+- 사용자 정의 필터 생성: 페이지 번호 매기기 예제
+    - $filter 서비스
+        - 이름을 기준으로 필터의 인스턴스를 찾는 함수
+    - Filter 접미사를 사용하는 것이 더 쉬운 방법
+        - function ($filter) { ... $filter('limitTo')(input, limit-3) ... }
+            - 여러 개의 필터 인스턴스를 한 번에 가져와야 할 때 유용 
+        - function (limitToFilter) { ... limitToFilter(input, limit-3) ... }
+- 필터 주의 사항
+    - 필터를 사용할 때 피해야할 것 --> 필터에서 HTML 을 만들어 내는 것
+        - <-- 잠재적으로 웹 페이지가 HTML 주입 공격에 취약해진다
+    - 필터의 데이터 변형 비용
+        - 각 digest cycle 에서 여러 번 호출된다. <-- AngularJS의 점검 동작일 뿐이다.
+            - --> 그러므로 필터는 최대한 가볍고 빠르게 만들어야 한다
+    - 불안정한 필터
+        - 필터는 여러 번 호출되기 때문에 결과가 반드시 같아야 한다 <-- 이런 함수를 안정적인 함수라고 한다.
+        - Uncaught Error: 10 digest() iteration reached. Aborting!
+            - 표현식을 평가할 때마다 매번 다른 결과를 만들어냈다는 의미 

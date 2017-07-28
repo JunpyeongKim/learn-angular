@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="sampleApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Filter: $filter</title>
+    <script src="angular.js"></script>
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="bootstrap-theme.css" rel="stylesheet">
+
+    <script>
+        angular.module('sampleApp', []).
+                controller('mainCtrl', ['$scope', '$filter', function ($scope, $filter) {
+                    var userList = [
+                        { userId: 'jay', userName: '제이', userEmail: 'jay@ng.com' },
+                        { userId: 'soon', userName: '순희', userEmail: 'soon@ng.com' },
+                        { userId: 'cindy', userName: '가영', userEmail: 'cindy@ng.com' },
+                        { userId: 'mino', userName: '민호', userEmail: 'mino@ng.com' },
+                        { userId: 'teapong', userName: '태홍', userEmail: 'teapong@ng.com' }
+                    ];
+
+                    $scope.value = new Date();
+                    $scope.dateFormattedValue = $filter('date')($scope.value, 'yyyy-MM-dd');
+                    $scope.userList = userList;
+                    $scope.filter = function (filterObj) {
+                        $scope.userList = $filter('filter')(userList, filterObj);
+                    };
+                }]);
+    </script>
+</head>
+<body>
+    <div ng-controller="mainCtrl" class="panel">
+        <h1 class="panel-heading">Filter: $filter</h1>
+
+        <div class="well">
+        <p>필터 사용 전 날짜 데이터 : {{value}}</p>
+        <p>date 필터 사용 : {{dateFormattedValue}}</p>
+        </div>
+
+        <div class="well">
+            <div>사용자 이름 : <input type="text" ng-model="search"><button class="btn btn-default" ng-click="filter(search)">필터처리</button>
+                <ul>
+                    <li ng-repeat="user in userList">
+                        <p>{{user.userId}} | {{user.userName}} | {{user.userEmail}}</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

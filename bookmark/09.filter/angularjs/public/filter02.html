@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="sampleApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Filter: Filtering</title>
+    <script src="angular.js"></script>
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="bootstrap-theme.css" rel="stylesheet">
+
+    <script>
+        angular.module('sampleApp', []).
+                controller('mainCtrl', ['$scope', function ($scope) {
+                    $scope.userList = [
+                        { userId: 'jay', userName: '제이', userEmail: 'jay@ng.com' },
+                        { userId: 'soon', userName: '순희', userEmail: 'soon@ng.com' },
+                        { userId: 'cindy', userName: '가영', userEmail: 'cindy@ng.com' },
+                        { userId: 'mino', userName: '민호', userEmail: 'mino@ng.com' },
+                        { userId: 'teapong', userName: '태홍', userEmail: 'teapong@ng.com' }
+                    ];
+
+                    console.log('order:', $scope.order, ', reverse:', $scope.reverse);
+                }]);
+    </script>
+</head>
+<body>
+    <div ng-controller="mainCtrl" class="panel">
+        <h1 class="panel-heading">Filter: Filtering</h1>
+
+        <div  class="well">
+            <h2>filter</h2>
+            <div>사용자 이름 : <input type="text" ng-model="search"/></div>
+            <ul>
+                <li ng-repeat="user in userList | filter:search">
+                    <p>{{user.userId}} | {{user.userName}} | {{user.userEmail}}</p>
+                </li>
+            </ul>
+        </div>
+
+        <div  class="well">
+            <h2>limitTo</h2>
+            <div>제한 갯수 : <input type="number" ng-model="limitNum"/></div>
+            <ul>
+                <li ng-repeat="user in userList | limitTo:limitNum">
+                    <p>{{user.userId}} | {{user.userName}} | {{user.userEmail}}</p>
+                </li>
+            </ul>
+        </div>
+
+        <div  class="well">
+            <h2>orderBy</h2>
+            <div>정렬 순서 :
+                아이디 <input type="radio" ng-model="order" value="userId"/>
+                이름 <input type="radio" ng-model="order" value="userName"/>
+                <br>
+                역순 여부 :
+                <input type="checkbox" ng-model="reverse"/>
+            </div>
+            <ul>
+                <li ng-repeat="user in userList | orderBy:order:reverse">
+                    <p>{{user.userId}} | {{user.userName}} | {{user.userEmail}}</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

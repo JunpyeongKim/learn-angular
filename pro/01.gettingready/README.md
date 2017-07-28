@@ -1,0 +1,59 @@
+1. Getting Ready
+=================
+
+# 1.1 개발 환경 설정
+- Browser 선택
+    - Google Chrome
+        - Google 에서 AngularJS를 지원하는 Chrome Extension Plugin(Batarang AngularJS)을 개발
+    - (*) AngularJS는 이전 버전의 IE 에서 일부 호환성 문제 존재
+        - http://docs.angularjs.org/guide/ie
+            - IE8 : AngularJS 1.2 (O), 1.3(X)
+            - IE9 and above : supported
+            - style="{{ some Css }}" --> <ng-style>
+            - (*) ci.angularjs.org [http://ci.angularjs.org/]
+- 코드 편집기 선택
+    - WebStorm, Sublime Text, MS Web Visual Studio Express 2013
+- Node.js 설치
+    - (*) http://www.nodejs.org
+- Web Server 설치 
+    - Node.js의 Connect 모듈 사용
+        - $ npm install connect@1.8.* 
+        - (*) --> $ npm install -g express express-generator
+    - server.js
+- 테스트 시스템 설치 
+    - Karma(Test Runner) & Jasmine(Test Framework) 사용
+        - $ npm install karma -g
+        - (*) --> $ sudo npm install -g karma karma-cli 
+- AnurlarJS 디렉토리 생성
+    - (*) http://angularjs.org
+    - AngularJS 라이브러리 다운로드 : 최신의 & 안정적
+        - angular.js
+    - AngularJS 추가 파일 다운로드 : Download AngularJS --> Extra (촤측 하단)
+        - angular-route.js & angular-resource.js
+        - (*) angular-[touch, animate, mocks, route, sanitize, locale-fr-fr].js
+    - Bootstrap 다운로드
+        - (*) http://getbootstrap.com
+        - bootstrap.css & bootstrap-theme.css
+    - (*) http://livereload.com
+        - 폴더 내 파일을 모니터링하고 변경 사항을 감지하면 자동으로 브라우저를 재로드해준다
+        - 9.99 $
+    - Deployd 다운로드
+        - (*) https://github.com/deployd/deployd & http://deployd.com
+        - The macosx installer is deprecated.
+            - $ npm install deployd -g
+            - and install mongodb separately
+        - 웹 애플리케이션용 API를 모델링할 수 있는 훌륭한 크로스플랫폼 툴
+        - Node.js & MongoDB 기반으로 개발됨
+        - 데이터는 JSON으로 저장
+        - 개발이 중단된 상태
+- 간단한 테스트 수행
+    - test.html
+    - 웹 서버 실행
+        - $ node server.js --> $ node bin/www
+    - 테스트 파일 로드
+        - $ http://localhost:3000/test.html
+    - (*) Web Server : Connect --> Express 로 변경
+        - $ express angularjs
+        - $ mv angular.js bootstrap*.css test.html public/
+        - $ node bin/www
+        - open localhost:3000/test.html

@@ -1,0 +1,16 @@
+<!-- partial view 에 <style>을 직접 넣지 않는 편이 좋다
+     - 되도록 메인 HTML 에서 불러오도록 하자
+-->
+<style>
+    .navbar-right { float: right !important; margin-right: 5px; }
+    .navbar-text { margin-right: 10px; }
+</style>
+
+<div class="navbar-right">
+    <div class="navbar-text">
+        Your cart:
+        {{itemCount()}} items(s),
+        {{total() | currency}}
+    </div>
+    <a href="#/checkout" class="btn btn-default navbar-btn">Checkout</a>
+</div>

@@ -1,0 +1,178 @@
+20. Services for Ajax and Promises
+===================================
+
+# 20.1 Ajax 서비스는 언제 왜 사용하나
+- 브라우저에서 새 콘텐츠를 로드하지 않고 서버와 통신할 경우
+
+# 20.2 예제 프로젝트 준비
+- productData.json
+
+
+# 20.3 Ajax 요청 수행
+- (*) $http 서비스 사용
+- ajax.html
+    - defaultCtrl
+        - loadData()
+        - $scope.products
+    - jQuery 와 다른점
+        - 서버에서 가져온 데이터를 $scope 에 바로 적용하기만 하면,
+        - 애플리케이션 내 HTML 엘리먼트를 업데이트하도록 바인딩이 자동으로 갱신된다.
+- Ajax 요청 수행
+    - get(url, config)
+    - post(url, data, config)
+    - delete(url, config)
+    - put(url, data, config)
+    - head(url, config)
+    - jsonp(url, config)
+        - JSON with Padding
+        - GET 으로 자바스크립트 코드 조각을 가져와서 실행 --> 보안상 상당히 위험
+            - 자바스크립트 코드를 로드할 수 있는 위치를 제한하는 브라우저 제약을 우회 가능
+        - (*) http://en.wikipedia.org/wiki/JSONP
+    - (*) GET vs. POST - 올바른 HTTP 방식의 선택
+        - GET : 안전한 상호작용 --> 읽기 전용 정보 조회
+        - POST : 안전하지 않은 상호작용 --> 애플리케이션 상태를 변경 
+- Ajax 응답 수신
+    - $http() 에서 반환하는 Promise 객체가 정의하는 메서드
+        - success(fn)
+            - Promise 를 리턴한단
+        - error(fn)
+            - Promise 를 리턴한단
+        - then(fn, fn)
+            - 서버에서 받은 응답에 대한 상세 정보에 접근 가능
+                - data
+                - status
+                - headers
+                    - 헤더를 가져올수 있는 함수
+                - config
+    - 그 외 데이터 타입 처리
+        - productData.xml
+        - ajax.html
+            - (*) jqLite 를 활용하면 HTML 처럼 XML 코드를 처리 가능
+                - 즉, angular.element() 를 활용해 그 결과를 jqLite 객체로 감싼다
+            - response.data.trim()
+            - angular.element().find('product')
+                - JQLite[6]
+            - angular.element().find('product').eq(i).attr('...')
+- Ajax 요청 설정
+    - (*) AngularJS 의 2가지 기본 변형
+        - JSON 직렬화
+        - JSON 객체화
+    - (*) 선택 인자
+        - data
+        - headers
+        - method
+        - params
+        - timeout
+        - transformRequest
+        - transformResponse
+        - url
+        - withCredentials
+        - xsrfHeaderName
+        - xsrfCookieName
+    - 응답 변형
+        - transformResponse
+            - jqLite 기법을 활용하여 XML 을 JavaScript 객체 배열로 처리
+        - (*) 배열 또는 $httpProvider 를 사용하면 변형 함수를 여러 개 지정 가능
+    - 요청 변형
+        - transformRequest
+            - (*) 훌륭한 자바스크립트 라이브러기가  이미 많으므로 jqLite 는 잘 사용하지 않는다
+            - angular.element('<xml>')
+                - jqLite 에서는 엘리먼트의 내용은 쉽게 가져올 수 있으나 엘리먼트 자체는 가져오기 쉽지않다
+                - 이 문제를 해결하려면 <dummy> 를 생성하는게 좋다
+                    - ex) angular.element('<dummy>')
+                        - 여기서 지정한 엘리먼트는 최종 결과에 포함되지 않는다 
+            - rootElem.children().wrap('<products>')
+                - 원하는 최상위 엘리먼트 삽입
+            - rootElem.html()
+        - $scope.sendData()
+- Ajax 기본값 설정
+    - $httpProvider 이용하여 Ajax 요청의 기본 설정 정의 가능
+        - defaults
+            - .headers
+                - .common
+                - .post
+                - .put
+            - .transformResponse
+                - 함수 배열
+            - .transformRequest
+                - 함수 배열
+        - interceptors
+            - 함수 배열
+        - withCredentials
+    - Module.config()
+        - $httpProvider.defaults.transformResponse.push()
+- Ajax 인터셉터 활용
+    - (*) $httpProvider 는 "요청 인터셉터" 제공
+    - Module.config()
+        - $httpProvider.interceptors.push()
+            - (*) factory function 으로 구성된 배열
+                - request
+                - requestError
+                - response
+                - responseError
+
+# 20.4 Promise 활용
+- (*) jQuery를 비롯한 여러 라이브러이에 존재 --> 구현체에는 여러 차이점이 있다
+- 필요한 객체는 2가지
+    - Promise 객체
+        - 알림을 수신하는데 사용
+    - Deferred 객체
+        - 알림을 전송하는데 사용
+- promises.html
+- $q 서비스
+    - (*) Promise 를 가져오고 관리할 수 있는 서비스
+    - all(promises)
+    - defer()
+    - reject(reason)
+    - when(value)
+- 지연 객체 가져오기 및 활용
+    - $q.defer()
+        - (*) 기본적인 사용 패턴
+            - resolve() 나 reject() 를 사용해 활동의 결과를 알린다
+            - 필요에 따라 notify() 를 통해 중간 업데이트 정보를 제공
+        - resolve(result)
+        - reject(reason)
+        - notify(result)
+        - promise
+    - directive
+        - promiseWorker
+            - link() : jqLite 를 사용해 <button> 를 찾는다
+- Promise 찾기
+    - directive
+        - promiseObserver
+            - require : 다른 디렉티브로부터 컨트롤러를 가져올 수 있다.
+    - Promise 정의 메서드
+        - then(success, error, notify)
+        - catch(error)
+        - finally(fn)
+- Promise 가 일반 이벤트가 아닌 이유
+    - 한 번만 사용하고 버려짐
+        - 한 번 resolve 되거나 reject 되고 나면 다시 사용 불가
+    - 결과 알림
+        - 활동을 수행하지 않았거나, reject() 를 통해 활동이 실패함에 따라 아무 결과가 없을 때도 이를 알려주는 데 사용
+- Promise Chain
+    - (*) then() 이 또 다른 Promise 를 반환하기 때문에 가능
+    - promises.html
+        - 첫번째 Promise의 error callback 이 존재하는 경우
+            - reject()이 호출되면 첫번째 error callback이 호출된후 두번째 Promise의 success callback 이 호출 된다
+            - 즉, 두번째 Promise의 error callback 은 호출되지 않는다
+        - 첫번째 Promise의 error callback 이 존재하지 않는 경우
+            - reject() 호출시 error callback 을 찾을때가지 Promise Chain 을 검색한다
+        - ==> 만약 첫번째 Promise의 success/error callback 이 호출되면, 다음 Promise의 success callback 만 호출된다
+- Promise Grouping
+    - $q.all()
+        - 인자 : promise array
+        - 입력 promise 가 모두 resolve 될 때까지 resolve 되지 않는 promise 반환
+        - 즉 "모든" 입력 Promise 가 Resolve 될 때까지 Resolve 되지 않고, 입력 Promise 중 "하나라도 거부되면" 거부되는 Promise 가 반환된다.
+    - class
+        - btn-group
+        - event.target.getAttribute()
+    - string.join()
+    - 5개의 Promise
+        - 1) Heads/Tail Promise
+        - 2) Yes/No Promise
+        - 3) 1) 이나 2) 가 resolve 될때 resolve 되는 Promise --> $q.all()
+        - 4) $q.all().then() Promise
+        - 5) ctrl.promise.then() Promise
+    
+    

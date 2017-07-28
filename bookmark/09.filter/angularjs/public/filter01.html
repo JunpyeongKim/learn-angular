@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="sampleApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Filter: Formatting</title>
+    <script src="angular.js"></script>
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="bootstrap-theme.css" rel="stylesheet">
+
+    <script>
+        angular.module('sampleApp', []).
+                controller('mainCtrl', ['$scope', function ($scope) {
+                    $scope.cValue = 6300;
+                    $scope.dNow = new Date();
+                    $scope.jObj = { name: '순희' };
+                    $scope.lString = 'Cindy Kim';
+                    $scope.nValue = 10/3;
+                }]);
+    </script>
+</head>
+<body>
+    <div ng-controller="mainCtrl" class="panel">
+        <h1 class="panel-heading">Filter : Formatting</h1>
+
+        <div class="well">
+            <h2>currency</h2>
+            <p>Original: {{cValue}}</p>
+            <p>Filtered: {{cValue | currency}}</p>
+        </div>
+
+        <div class="well">
+            <h2>date</h2>
+            <p>Original: {{dNow}}</p>
+            <p>Filtered (default): {{dNow | date}}</p>
+            <p>Filtered (custom): {{dNow | date:'yyyy년 MM년 dd일'}}</p>
+        </div>
+
+        <div class="well">
+            <h2>json</h2>
+            <p>Original: {{jObj}}</p>
+            <p>Filtered: {{jObj | json}}</p>
+        </div>
+
+        <div class="well">
+            <h2>lowercase</h2>
+            <p>Original: {{lString}}</p>
+            <p>Filtered: {{lString | lowercase}}</p>
+        </div>
+
+        <div class="well">
+            <h2>uppercase</h2>
+            <p>Original: {{lString}}</p>
+            <p>Filtered: {{lString | uppercase}}</p>
+        </div>
+
+        <div class="well">
+            <h2>number</h2>
+            <p>Original: {{nValue}}</p>
+            <p>Filtered: {{nValue | number}}</p>
+            <p>Filtered with 5: {{nValue | number:5}}</p>
+        </div>
+    </div>
+</body>
+</html>

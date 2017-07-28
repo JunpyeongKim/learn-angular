@@ -1,0 +1,145 @@
+21. Services for REST
+======================
+- (*) Representational State Transfer
+- Request URL
+    - REST API : 작업할 "데이터"를 식별한다
+    - HTTP : 수행할 "작업"을 식별한다
+- (*) RESTful API
+    - REST 스타일을 따르는 API 
+
+
+# 21.1 REST 서비스는 언제 왜 사용하나
+- RESTful API 에 대한 데이터 작업을 수행할 때 사용
+
+
+# 21.2 예제 프로젝트 준비
+- (*) Deployd
+- RESTful 서비스 생성
+    - $ dpd create products
+    - $ dpd -p 5500 products/app.dpd
+    - > dashboard
+        - default browser 로 dashboard 웹사이트에 접속된다
+    - 데이터 구조 생성
+        - '+' 버늩 --> Collection --> '/products'
+            - name : string, Required
+            - category : string, Required
+            - price : number, Required
+    - 초기 데이터 추가
+        - Apples, Fruit, 1.20
+        - Bananas, Fruit, 2.42
+        - Pears, Fruit, 2.02
+        - Tuna, Fish, 20.45
+        - Salmon, Fish, 17.93
+        - Trout, Fish, 12.93
+    - API 테스트
+        - Open http://localhost:5500/products
+- AngularJS 애플리케이션 구현
+    - products.html
+        - products.js
+            - REST 에 대응하는 동작
+                - listProducts()
+                - deleteProduct()
+                - createProduct()
+                - updateProduct()
+            - User Interface 지원
+                - editOrCreateProduct()
+                - saveEdit()
+                - cancelEdit()
+        - (*) <!-- ng-include: undefined -->
+            - src="" 에 literal 을 사용하지 않을 경우 발생 가능
+            - src="" 의 파일이 존재하지 않을 경우 발생
+        - tableView.html
+        - editorView.html
+    - 애플리케이션 테스트
+        - products.html 을 브라우저로 로드하면 된다
+        - (*) 수정할 데이터 객체가 id 를 갖고 있다는 사실을 기반으로 수정 또는 생성 작업 수행
+        - (*) angular.copy() 사용
+
+
+# 21.3 $http 서비스 활용
+- (*) RESTful 서비스는 표준 비동기적 HTTP 요청을 사용해 처리된다
+- 상품 데이터 조회
+    - products.js
+        - constant(baseUrl)
+        - $http.get()
+- 상품 삭제
+    - products.js
+        - deleteProduct()
+            - $http({method: 'DELETE', ...}) or $http.delete()
+- 상품 생성
+    - products.js
+        - $http.post()
+- 상품 수정
+    - products.js
+        - $http({method: 'PUT', ...}) or $http.put()
+- Ajax 구현 테스트
+    - N/A
+
+# 21.4 Ajax 요청 숨기기
+- (*) $http 문제점
+    - 로컬 데이터와 서버 데이터를 조작하는 동작이 별개로 존재함에 따라 두 데이터 동기화에 주의 필요
+- increment.js
+    - 고립 스코프에 대해 양방향 바인딩을 사용 
+    - price 속성 값을 늘릴 때 필요한 Ajax 업데이트를 수행하지 않으므로 로컬 데이터는 서버 데이터와 제대로 동기화 되지 않는다
+        - 해결 : 로컬 데이터가 변경될 때마다 필요한 Ajax 요청이 자동으로 생성되게끔 해야 한다
+- ngResource 모듈 설치
+    - angular-resource.js 
+- $resource 서비스 활용
+    - products.js
+        - productsResource = $resource(baseUrl + ':id", { id: '@id' })
+            - query()
+        - product.$delete()
+        - new productsResource(product).$save()
+    - $resource 서비스 설정
+        - (*) $resource 서비스 객체 : RESTful 서비스를 처리하는데 사용하는 URL을 설명하는 함수
+        - productsResource = $resource(baseUrl + ':id", { id: '@id' })
+            - baseUrl + ':id' --> http://localhost:5500/products/:id
+            - @id : 데이터 객체의 속성으로 바인딩
+            - $resource() --> 접근 객체를 반환
+                - delete(params, product)
+                - get(id)
+                - query()
+                - remove(params, product)
+                - save(product)
+                - (*) delete, remove 는 동일
+    - REST 데이터 조회
+        - query() 의 결과는 초기에는 비어있는 컬렉션 배열 --> Ajax 요청이 완료되면 데이터가 컬렉션안으로 들어간다
+        - (*) query() 에서 반환하는 컬렉션 배열에 $promise 속성 추가되어 있다
+            - 이 Promise 는 결과 배열이 채워진후 resolve 된다
+            - 즉, query() 의 결과인 컬렉션 배열을 esuccess callback 으로 전달한다
+    - 데이터 객체 수정
+        - (*) query() : Resource 객체를 사용해 컬렉션 배열을 채운다
+        - Resource 객체 메서드
+            - $delete()
+            - $get()
+            - $remove()
+            - $save()
+    - 데이터 객체 삭제
+        - $delete() or $remove()
+        - 주의 : 서버로 객체 제거 요청을 하지만 컬렉션 배열에서 객체를 삭제하지는 않는다 --> Promise 객체 사용해 해결
+    - 새 객체 생성
+        - new 키워드를 사용하여 $resource 메서드를 데이터 객체에 적용해 데이터를 서버에 저장
+- $resource 서비스 행동 설정
+    - (*) get(), save(), query(), remove(), delete() : 컬렉션 배열에서 사용 가능
+    - (*) $get(), $save(), $query(), $remove(), $delete() : Resource 객체 메서드 --> "action' 이라고 부른다
+    - Deployd API 에 맞게 action 을 수정 가능
+        - product.js
+            - 설정 객체를 세 번째 인자로 사용 --> { create: { method: 'POST' }, save: { method: 'PUT' } }
+            - createProduct()
+        - (*) 설정 속성
+            - method
+            - params
+                - $resource() 의 첫번째 인자로 전달되는 영역 변수 값을 지정
+            - url
+                - 기본 URL 을 override
+            - isArray
+                - true : 응답이 JSON Array
+                - false : default, 응답이 단일 객체
+            - (*) transformRequest, transformResponse, cache, timeout, withCredentials, responseType, interceptor 사용 가능
+            - ==> 정의된 action 은 기본 액션과 마찬가지로 컬렉션 배열이나 개별 Resource 객체를 대상으로 호출 가능
+- $resource 활용에 적합한 컴포넌트 구현
+    - increment.js
+        - =item <-- item=""
+        - @propertyName <-- property-name=""
+        - @restful <-- restful=""
+        - @methodName <-- method-name=""
